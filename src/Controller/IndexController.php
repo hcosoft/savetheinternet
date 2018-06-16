@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
+use App\Services\MapService;
 use App\Services\TweetService;
 use Smalot\Github\Webhook\Webhook;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -18,14 +18,19 @@ class IndexController extends Controller
      * @var TweetService
      */
     private $tweetService;
+    /**
+     * @var MapService
+     */
+    private $mapService;
 
     /**
      * IndexController constructor.
      * @param TweetService $tweetService
      */
-    public function __construct(TweetService $tweetService)
+    public function __construct(TweetService $tweetService, MapService $mapService)
     {
         $this->tweetService = $tweetService;
+        $this->mapService = $mapService;
     }
 
     /**
@@ -85,6 +90,35 @@ class IndexController extends Controller
         });
 
         return $response;
+    }
+
+    /**
+     * @Route("/map", methods={"POST"})
+     * @return JsonResponse
+     */
+    public function addMapEntry(Request $request): JsonResponse
+    {
+        $lat = $request->get('lat');
+        $lng = $request->get('lng');
+        $title = $request->get('title');
+        $timestamp = $request->get('timestamp');
+
+        if ($lat === null || $lng === null || $title === null || $timestamp === null) {
+            return new JsonResponse(['error' => 'missing field']);
+        }
+
+        $this->mapService->addLocation($lat, $lng, $title, $timestamp);
+
+        return new JsonResponse(['message' => 'add']);
+    }
+
+    /**
+     * @Route("/map", methods={"GET"})
+     * @return JsonResponse
+     */
+    public function getMapEntries(): JsonResponse
+    {
+        return new JsonResponse($this->mapService->getLocations());
     }
 
     /**

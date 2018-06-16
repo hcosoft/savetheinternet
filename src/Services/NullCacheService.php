@@ -59,4 +59,14 @@ class NullCacheService implements CacheServiceInterface
             }
         }
     }
+
+    public function addToSet(string $key, array $value): void
+    {
+        $this->content[$key][] = $value;
+    }
+
+    public function getSet(string $key): array
+    {
+        return $this->content[$key];
+    }
 }

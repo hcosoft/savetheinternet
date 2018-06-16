@@ -34,9 +34,19 @@ class RedisCacheService implements CacheServiceInterface
         $this->redis->set($key, $value);
     }
 
+    public function addToSet(string $key, array $value): void
+    {
+        $this->redis->sadd($key, $value);
+    }
+
     public function get(string $key): string
     {
         return $this->redis->get($key);
+    }
+
+    public function getSet(string $key): array
+    {
+        return $this->redis->smembers($key);
     }
 
     public function has(string $key): bool

@@ -15,4 +15,8 @@ interface CacheServiceInterface
     public function flush(): void;
 
     public function deleteWildcard(string $key): void;
+
+    public function addToSet(string $key, array $value): void;
+
+    public function getSet(string $key): array;
 }
